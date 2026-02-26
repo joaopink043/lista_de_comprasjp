@@ -1,0 +1,3 @@
+anon public: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxZW9hZnh6bXNkd25lamNxcWFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTIyMjYsImV4cCI6MjA4NzY4ODIyNn0.l---VZVfJIa4rfY1Ss0Q6QUrHY_d0119mbb-g5vsqhU
+
+url: https://xqeoafxzmsdwnejcqqaf.supabase.co
