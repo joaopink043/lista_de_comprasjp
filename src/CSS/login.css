@@ -68,3 +68,25 @@
         outline: none;
         box-shadow: 0 0 0 3px rgba(181, 1, 181, 0.25);
     }
+
+    .botoes {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+
+    }
+    button {
+        padding: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: var(--raio);
+        background-color: var(--cor-primaria-2);
+        color: var(--cor-branco);
+        transition: var(--transition);
+
+    }
+    button.hover {
+        background-color: var(--cor-primaria-1);
+    }
