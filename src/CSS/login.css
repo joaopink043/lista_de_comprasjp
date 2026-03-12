@@ -48,5 +48,23 @@
     .titulo {
         font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
         color: var(--cor-preto);
-        
+        margin-bottom: 1.5rm;
+        font-weight: 500;
+    }
+
+    input {
+        width: 100%;
+        padding: 14px;
+        margin: 10px 0;
+        border: 1px solid var(--cor-preto);
+        border-radius: var(--raio);
+        font-size: 1rem;
+        transition: var(--transition);
+
+    }
+
+    input.focus {
+        border-color: var(--cor-primaria-1);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(181, 1, 181, 0.25);
     }
