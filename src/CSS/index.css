@@ -34,3 +34,30 @@
         padding: 20px;
         
     }
+
+    .container {
+        background: var(--cor-branco);
+        padding: clamp(2rem, 5vh, 3rem);
+        border-radius: var(--raio);
+        box-shadow: 0 8px 24px var(--cor-sombra);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    
+
+    }
+
+    #logo{
+        width: 150px;
+        height: auto;
+        margin-bottom: 20px;
+        border-radius: var(--raio);
+    }
+
+
+    .titulo {
+        font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
+        color: var(--cor-preto);
+        margin-bottom: 1.5rm;
+        font-weight: 500;
+    }
