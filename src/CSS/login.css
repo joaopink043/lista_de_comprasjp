@@ -43,6 +43,17 @@
         width: 100%;
         max-width: 400px;
         text-align: center;
+    
+
+    }
+
+    #logo{
+        width: 150px;
+        height: auto;
+        margin-bottom: 20px;
+        border-radius: var(--raio);
+
+
 
     }
     .titulo {
