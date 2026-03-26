@@ -130,7 +130,7 @@
         box-shadow: 0 2px 6px var(--cor-primaria-1);
     }
 
-    button[onclick="AdicionarItem()"]{
+    button[onclick="adicionarItem()"]{
         padding: 12px 20px;
         background-color: var(--cor-primaria-1);
         color: var(--cor-bg);
@@ -142,7 +142,7 @@
         transition: var(--transition);
         
     }
-       button[onclick="AdicionarItem()"]:hover{
+       button[onclick="adicionarItem()"]:hover{
         background-color: var(--cor-primaria-1);
 
        }
