@@ -83,7 +83,7 @@
         width: 100%;
         max-width: 600px;
         list-style: none;
-        margin-bottom: 2rem;
+        margin-bottom: 32rem;
         padding: 0;
 
      }
@@ -144,5 +144,5 @@
     }
        button[onclick="AdicionarItem()"]:hover{
         background-color: var(--cor-primaria-1);
-        
+
        }
