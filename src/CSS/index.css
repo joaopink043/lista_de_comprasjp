@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-:root{
+:root {
     --cor-primaria-1: #335C81;
     --cor-primaria-2: #65AFFF;
     --cor-bg: #E0E1DD;
@@ -12,137 +12,139 @@
 
     --fonte: "Poppins", sans-serif;
     --raio: 12px;
-    --transition: 0.3s ease; 
+    --transition: 0.3s ease;
 
 }
 
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 
 }
 
-    body{
-        font-family: var(--fonte);
-        background: #335C81;
-        background: linear-gradient(90deg,rgba(51, 92, 129, 1) 50%, rgba(101, 175, 255, 1) 100%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 20px;
-        
-    }
+body {
+    font-family: var(--fonte);
+    background: #335C81;
+    background: linear-gradient(90deg, rgba(51, 92, 129, 1) 50%, rgba(101, 175, 255, 1) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
 
-    .container {
-        background: var(--cor-branco);
-        padding: clamp(2rem, 5vh, 3rem);
-        border-radius: var(--raio);
-        box-shadow: 0 8px 24px var(--cor-sombra);
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
-    
+}
 
-    }
-
-    #logo{
-        width: 150px;
-        height: auto;
-        margin-bottom: 20px;
-        border-radius: var(--raio);
-    }
+.container {
+    background: var(--cor-branco);
+    padding: clamp(2rem, 5vh, 3rem);
+    border-radius: var(--raio);
+    box-shadow: 0 8px 24px var(--cor-sombra);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
 
 
-    .titulo {
-        font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
-        color: var(--cor-preto);
-        margin-bottom: 1.5rm;
-        font-weight: 500;
-    }
+}
 
-    button[onclick="logout()"]{
-        align-self: flex-end;
-        margin-bottom: 1.5rem;
-        background-color: var(--cor-primaria-2);
-        color: var(--cor-branco);
-        padding: 10px 16px;
-        border: none;
-        border-radius: var(--cor-preto);
-        cursor: pointer;
-        font-weight: 500;
-        transition: var(--transition);
-    }
-     button[onclick="logout()"]:hover {
-        background-color: var(--cor-primaria-2);
+#logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: var(--raio);
+}
 
-     }
 
-     #lista {
-        width: 100%;
-        max-width: 600px;
-        list-style: none;
-        margin-bottom: 2rem;
-        padding: 0;
+.titulo {
+    font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
+    color: var(--cor-preto);
+    margin-bottom: 1.5rm;
+    font-weight: 500;
+}
 
-     }
+button[onclick="logout()"] {
+    align-self: flex-end;
+    margin-bottom: 1.5rem;
+    background-color: var(--cor-primaria-2);
+    color: var(--cor-branco);
+    padding: 10px 16px;
+    border: none;
+    border-radius: var(--cor-preto);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+}
 
-     #lista li{
-        background-color: var(--cor-branco);
-        border: 1px solid var(--cor-preto);
-        border-radius: var(--raio);
-        padding: 12px 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 6px var(--cor-primaria-1);
+button[onclick="logout()"]:hover {
+    background-color: var(--cor-primaria-2);
 
-        
-     } 
+}
 
-     #lista button{
-        background-color: var(--cor-primaria-1);
-        color: var(--cor-branco);
-        border-radius: var(--raio);
-        padding: 6px 12px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: var(--transition);
+#lista {
+    width: 100%;
+    max-width: 600px;
+    list-style: none;
+    margin-bottom: 2rem;
+    padding: 0;
 
-     }
+}
 
-     #item {
-        width: 100%;
-        max-width: 400px;
-        padding: 14px;
-        margin-bottom: 12px;
-        border: 1px solid var(--cor-preto);
-        border-radius: var(--raio);
-        font-size: 1rem;
-        transition: var(--transition);
+#lista li {
+    background-color: var(--cor-branco);
+    border: 1px solid var(--cor-preto);
+    border-radius: var(--raio);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 6px var(--cor-primaria-1);
 
-    }
 
-    #item:focus{
-        border: 1px solid var(--cor-primaria-1);
-        outline: none;
-        box-shadow: 0 2px 6px var(--cor-primaria-1);
-    }
+}
 
-    button[onclick="adicionarItem()"]{
-        padding: 12px 20px;
-        background-color: var(--cor-primaria-1);
-        color: var(--cor-bg);
-        border: none;
-        border-radius: var(--raio);
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: var(--transition);
-        
-    }
-       button[onclick="adicionarItem()"]:hover{
-        background-color: var(--cor-primaria-1);
+#lista button {
+    background-color: var(--cor-primaria-1);
+    color: var(--cor-branco);
+    border-radius: var(--raio);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: var(--transition);
 
-       }
+}
+
+#item {
+    width: 100%;
+    max-width: 400px;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--cor-preto);
+    border-radius: var(--raio);
+    font-size: 1rem;
+    transition: var(--transition);
+
+}
+
+#item:focus {
+    border: 1px solid var(--cor-primaria-1);
+    outline: none;
+    box-shadow: 0 2px 6px var(--cor-primaria-1);
+}
+
+button[onclick="adicionarItem()"] {
+    padding: 12px 20px;
+    background-color: var(--cor-primaria-1);
+    color: var(--cor-bg);
+    border: none;
+    border-radius: var(--raio);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: var(--transition);
+
+}
+
+button[onclick="adicionarItem()"]:hover {
+    background-color: var(--cor-primaria-1);
+
+}
