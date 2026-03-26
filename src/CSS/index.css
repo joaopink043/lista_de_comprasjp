@@ -125,5 +125,24 @@
     }
 
     #item:focus{
+        border: 1px solid var(--cor-primaria-1);
+        outline: none;
+        box-shadow: 0 2px 6px var(--cor-primaria-1);
+    }
+
+    button[onclick="AdicionarItem()"]{
+        padding: 12px 20px;
+        background-color: var(--cor-primaria-1);
+        color: var(--cor-bg);
+        border: none;
+        border-radius: var(--raio);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: var(--transition);
         
     }
+       button[onclick="AdicionarItem()"]:hover{
+        background-color: var(--cor-primaria-1);
+        
+       }
