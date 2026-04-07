@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="manifest" href="manifest.json"
         <link rel="stylesheet" href="src/CSS/index.css">
         <link rel="shortcut icon" href="src/CSS/img/favicon.ico" type="image/x-icon">
     <title>Lista de compras 2026</title>
@@ -22,6 +23,20 @@
     </div>
 
     <script type="module" src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Falha ao registrar o ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
+    
      
 </body>
 </html>
