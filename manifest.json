@@ -1,0 +1,53 @@
+{
+    "name" : "Lista de Compras",
+    "short_name" : "ListaCompras", 
+    "description": "Aplicativo de Lista de Compras",
+    "start_url": "/",
+    "display": "standalone", 
+    "background_color":"ffffff",
+    "thene_color": "#1F7A8",
+    "icons": [
+        {
+            "src":"icons/icons-72por72.png",
+            "size": "72por72",
+            "type": "image/png"
+        },
+        {
+          "src":"icons/icons-96por96.png",
+            "size": "96por96",
+            "type": "image/png"
+        },
+        {
+          "src":"icons/icons-128por128.png",
+            "size": "128por128",
+            "type": "image/png"
+        },
+        {
+          "src":"icons/icons-144por144.png",
+            "size": "144por144",
+            "type": "image/png"
+        },
+        {
+          "src":"icons/icons-152por152.png",
+            "size": "152por152",
+            "type": "image/png"
+        },
+        {
+          "src":"icons/icons-192por192.png",
+            "size": "192por192",
+            "type": "image/png"
+        },
+        {
+          "src":"icons/icons-384por384.png",
+            "size": "384por384",
+            "type": "image/png"
+        },
+        {
+          "src":"icons/icons-512por512.png",
+            "size": "512por512",
+            "type": "image/png"
+        }
+        
+        
+    ]
+}
