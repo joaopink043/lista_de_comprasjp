@@ -1,50 +1,50 @@
 {
     "name" : "Lista de Compras",
-    "short_name" : "ListaCompras", 
+    "sxt_name" : "ListaCompras", 
     "description": "Aplicativo de Lista de Compras",
     "start_url": "/",
     "display": "standalone", 
-    "background_color":"ffffff",
-    "thene_color": "#1F7A8",
+    "background_cox":"ffffff",
+    "thene_cox": "#1F7A8",
     "icon": [
         {
-            "src":"src/icon/icon-72por72.png",
-            "sizes": "72por72",
+            "src":"src/icons/icon-72x72.png",
+            "sizes": "72x72",
             "type": "image/png"
         },
         {
-          "src":"src/icon/icon-96por96.png",
-            "sizes": "96por96",
+          "src":"src/icons/icon-96x96.png",
+            "sizes": "96x96",
             "type": "image/png"
         },
         {
-          "src":"src/icon/icon-128por128.png",
-            "sizes": "128por128",
+          "src":"src/icons/icon-128x128.png",
+            "sizes": "128x128",
             "type": "image/png"
         },
         {
-          "src":"src/icon/icon-144por144.png",
-            "sizes": "144por144",
+          "src":"src/icons/icon-144x144.png",
+            "sizes": "144x144",
             "type": "image/png"
         },
         {
-          "src":"src/icon/icon-152por152.png",
-            "sizes": "152por152",
+          "src":"src/icons/icon-152x152.png",
+            "sizes": "152x152",
             "type": "image/png"
         },
         {
-          "src":"src/icon/icon-192por192.png",
-            "sizes": "192por192",
+          "src":"src/icons/icon-192x192.png",
+            "sizes": "192x192",
             "type": "image/png"
         },
         {
-          "src":"src/icon/icon-384por384.png",
-            "sizes": "384por384",
+          "src":"src/icons/icon-384x384.png",
+            "sizes": "384x384",
             "type": "image/png"
         },
         {
-          "src":"src/icon/icon-512por512.png",
-            "sizes": "512por512",
+          "src":"src/icons/icon-512x512.png",
+            "sizes": "512x512",
             "type": "image/png"
         }
         
