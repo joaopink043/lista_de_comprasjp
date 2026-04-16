@@ -11,15 +11,19 @@
     
     <!-- CSS Principal -->
     <link rel="stylesheet" href="src/css/login.css">
-    
-    <!-- Fonte (Poppins via CSS) -->
 </head>
 <body>
-    <!-- Elementos decorativos de fundo para profundidade -->
+    <!-- Elementos decorativos de fundo -->
     <div class="bg-decoration">
         <div class="bg-circle bg-circle-1"></div>
         <div class="bg-circle bg-circle-2"></div>
     </div>
+
+    <!-- Toggle de Tema (Flutuante) -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+        <span class="theme-icon-light">☀️</span>
+        <span class="theme-icon-dark">🌙</span>
+    </button>
 
     <div class="container">
         <!-- Header com Logo e Boas-vindas -->
@@ -51,7 +55,7 @@
                 </div>
             </div>
 
-            <!-- Link Esqueceu a Senha (Placeholder) -->
+            <!-- Link Esqueceu a Senha -->
             <div class="forgot-password">
                 <a href="#">Esqueceu a senha?</a>
             </div>
@@ -63,12 +67,48 @@
             </div>
         </form>
 
-        <!-- Footer opcional (créditos ou info) -->
+        <!-- Footer -->
         <footer class="login-footer">
             <p>Lista de Compras 3°SIS · v1.0</p>
         </footer>
     </div>
 
+    <!-- Script de Tema (antes do auth.js para evitar flash) -->
+    <script>
+        (function() {
+            // Aplica o tema antes da renderização para evitar FOUC (Flash of Unstyled Content)
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
     <script type="module" src="auth.js"></script>
+    <script>
+        // Toggle de Tema (pode ser movido para um arquivo separado)
+        const themeToggle = document.getElementById('themeToggle');
+        
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+        
+        // Sincroniza com mudanças do sistema (opcional)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
 </body>
 </html>

@@ -11,8 +11,6 @@
     
     <!-- CSS Principal -->
     <link rel="stylesheet" href="src/css/index.css">
-    
-    <!-- Fonte Poppins será importada no CSS -->
 </head>
 <body>
     <div class="app-container">
@@ -24,19 +22,23 @@
                     <span class="sync-badge" title="Sincronizado">🔄 Compartilhada</span>
                 </div>
                 <div class="header-actions">
+                    <!-- Toggle de Tema no Header -->
+                    <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+                        <span class="theme-icon-light">☀️</span>
+                        <span class="theme-icon-dark">🌙</span>
+                    </button>
                     <button class="btn-icon" onclick="logout()" title="Sair da conta">
                         <span class="icon">↗️</span>
                         <span class="btn-text">Sair</span>
                     </button>
                 </div>
             </div>
-            <!-- Linha decorativa sutil -->
             <div class="header-divider"></div>
         </header>
 
         <!-- Conteúdo Principal -->
         <main class="app-main">
-            <!-- Estado de Lista Vazia (escondido por padrão, mostrado via JS) -->
+            <!-- Estado de Lista Vazia -->
             <div id="empty-state" class="empty-state" style="display: none;">
                 <div class="empty-illustration">🛒✨</div>
                 <h3>Sua lista está vazia</h3>
@@ -45,17 +47,7 @@
 
             <!-- Lista de Compras -->
             <ul id="lista" class="lista-compras">
-                <!-- Os itens serão inseridos aqui via JS -->
-                <!-- Exemplo de estrutura esperada (gerada pelo JS):
-                <li class="item-card">
-                    <label class="item-checkbox">
-                        <input type="checkbox" class="checkbox-input">
-                        <span class="checkbox-custom"></span>
-                        <span class="item-text">Nome do Item</span>
-                    </label>
-                    <button class="btn-delete" onclick="removerItem(this)">🗑️</button>
-                </li>
-                -->
+                <!-- Itens serão inseridos via JS -->
             </ul>
         </main>
 
@@ -71,24 +63,60 @@
         </footer>
     </div>
 
-    <!-- Scripts -->
+    <!-- Script de Tema (Anti-Flash) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+
+    <!-- Scripts da Aplicação -->
     <script type="module" src="app.js"></script>
     <script>
-        // Registro do Service Worker (mantido)
+        // Registro do Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
-                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
+                        console.log('ServiceWorker registrado:', registration.scope);
                     })
                     .catch(error => {
-                        console.log('Falha ao registrar o ServiceWorker:', error);
+                        console.log('Falha no ServiceWorker:', error);
                     });
             });
         }
 
-        // Pequeno ajuste para o estado vazio (pode ser movido para o app.js)
-        // Apenas um fallback caso o app.js não controle isso ainda.
+        // Toggle de Tema
+        const themeToggle = document.getElementById('themeToggle');
+        
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+        
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+            });
+        }
+        
+        // Sincroniza com sistema
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        // Gerenciamento do Estado Vazio
         function verificarEstadoVazio() {
             const lista = document.getElementById('lista');
             const emptyState = document.getElementById('empty-state');
@@ -101,7 +129,6 @@
             }
         }
         
-        // Observa mudanças na lista (para demonstração, idealmente no app.js)
         const observer = new MutationObserver(verificarEstadoVazio);
         window.addEventListener('DOMContentLoaded', () => {
             const lista = document.getElementById('lista');

@@ -1,36 +1,38 @@
 /* ===== IMPORTS & FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* ===== VARIÁVEIS & RESET ===== */
+/* ===== VARIÁVEIS BASE (Tema Claro - Padrão) ===== */
 :root {
-    /* Cores Principais */
-    --primary-dark: #1B3A5C;    /* Tom mais profundo para textos e profundidade */
-    --primary-base: #335C81;    /* Azul principal */
-    --primary-light: #65AFFF;   /* Azul claro para realces */
-    --accent: #FFB347;          /* Cor de destaque para CTAs (opcional, mantive o azul para consistência) */
+    /* Cores Principais (Mantém consistência entre temas) */
+    --primary-dark: #1B3A5C;
+    --primary-base: #335C81;
+    --primary-light: #65AFFF;
     
-    /* Backgrounds & Superfícies */
+    /* Tema Claro (Default) */
     --bg-gradient-start: #1B3A5C;
     --bg-gradient-end: #4A90E2;
     --surface-white: #FFFFFF;
     --surface-subtle: #F8FAFC;
+    --surface-card: rgba(255, 255, 255, 0.95);
     
-    /* Texto */
     --text-primary: #0F1825;
     --text-secondary: #475569;
     --text-tertiary: #94A3B8;
     --text-on-primary: #FFFFFF;
     
-    /* Sombras (Mais suaves e modernas) */
     --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
     --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
     --shadow-focus: 0 0 0 4px rgba(101, 175, 255, 0.25);
     
+    --border-light: 1px solid rgba(255, 255, 255, 0.3);
+    --border-subtle: 1px solid rgba(0, 0, 0, 0.05);
+    --border-input: 1.5px solid transparent;
+    
     /* Bordas e Raio */
     --radius-card: 28px;
     --radius-input: 16px;
-    --radius-button: 40px; /* Botões pill-shaped */
+    --radius-button: 40px;
     
     /* Tipografia */
     --font-primary: "Poppins", sans-serif;
@@ -39,8 +41,59 @@
     --transition-fast: 0.15s ease;
     --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-theme: 0.3s ease;
 }
 
+/* ===== TEMA ESCURO ===== */
+[data-theme="dark"] {
+    --bg-gradient-start: #0F172A;
+    --bg-gradient-end: #1E293B;
+    --surface-white: #1E293B;
+    --surface-subtle: #0F172A;
+    --surface-card: rgba(30, 41, 59, 0.95);
+    
+    --text-primary: #F1F5F9;
+    --text-secondary: #CBD5E1;
+    --text-tertiary: #64748B;
+    --text-on-primary: #FFFFFF;
+    
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    --shadow-focus: 0 0 0 4px rgba(101, 175, 255, 0.35);
+    
+    --border-light: 1px solid rgba(255, 255, 255, 0.1);
+    --border-subtle: 1px solid rgba(255, 255, 255, 0.05);
+    --border-input: 1.5px solid rgba(255, 255, 255, 0.1);
+    
+    /* Ajustes específicos para o tema escuro */
+    .input-group {
+        background: rgba(15, 23, 42, 0.6);
+    }
+    
+    .input-group:focus-within {
+        background: var(--surface-white);
+    }
+    
+    .btn-secondary {
+        color: var(--primary-light);
+        border-color: var(--primary-light);
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(101, 175, 255, 0.15);
+    }
+    
+    .login-footer {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .bg-decoration .bg-circle {
+        opacity: 0.3;
+    }
+}
+
+/* ===== RESET & BASE ===== */
 * {
     margin: 0;
     padding: 0;
@@ -60,9 +113,70 @@ body {
     color: var(--text-primary);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    transition: background var(--transition-theme);
 }
 
-/* ===== DECORAÇÕES DE FUNDO (SUAVES) ===== */
+/* ===== TOGGLE DE TEMA ===== */
+.theme-toggle {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 100;
+    background: var(--surface-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--border-light);
+    border-radius: 60px;
+    padding: 10px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    color: var(--text-primary);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: var(--shadow-lg);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-icon-light,
+.theme-icon-dark {
+    font-size: 1.5rem;
+    position: absolute;
+    transition: all var(--transition-base);
+}
+
+/* Mostra/esconde ícones baseado no tema */
+.theme-icon-light {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+.theme-icon-dark {
+    opacity: 0;
+    transform: rotate(-90deg);
+}
+
+[data-theme="dark"] .theme-icon-light {
+    opacity: 0;
+    transform: rotate(90deg);
+}
+
+[data-theme="dark"] .theme-icon-dark {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+/* ===== DECORAÇÕES DE FUNDO ===== */
 .bg-decoration {
     position: fixed;
     top: 0;
@@ -78,6 +192,7 @@ body {
     border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0) 70%);
     filter: blur(60px);
+    transition: opacity var(--transition-theme);
 }
 
 .bg-circle-1 {
@@ -99,7 +214,7 @@ body {
 .container {
     position: relative;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--surface-card);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius-card);
@@ -108,8 +223,9 @@ body {
     max-width: 460px;
     padding: 40px 36px;
     text-align: center;
-    transition: transform var(--transition-base), box-shadow var(--transition-base);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all var(--transition-base);
+    border: var(--border-light);
+    color: var(--text-primary);
 }
 
 .container:hover {
@@ -129,10 +245,10 @@ body {
 #logo {
     width: 80px;
     height: 80px;
-    border-radius: 22px; /* Cantos arredondados para o ícone, estilo iOS */
+    border-radius: 22px;
     box-shadow: var(--shadow-md);
     transition: transform var(--transition-base);
-    object-fit: cover; /* Garante que a imagem preencha bem */
+    object-fit: cover;
 }
 
 #logo:hover {
@@ -162,14 +278,14 @@ body {
     gap: 20px;
 }
 
-/* Grupo de Input (com ícone) */
+/* Grupo de Input */
 .input-group {
     display: flex;
     align-items: center;
     background: var(--surface-subtle);
     border-radius: var(--radius-input);
     padding: 4px 16px;
-    border: 1.5px solid transparent;
+    border: var(--border-input);
     transition: border-color var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
     box-shadow: var(--shadow-sm);
 }
@@ -191,7 +307,7 @@ body {
     color: var(--primary-base);
 }
 
-/* Wrapper para o efeito de Floating Label */
+/* Wrapper para Floating Label */
 .input-field-wrapper {
     position: relative;
     flex: 1;
@@ -199,7 +315,7 @@ body {
 
 .input-field {
     width: 100%;
-    padding: 18px 0 8px 0; /* Espaço para a label flutuar */
+    padding: 18px 0 8px 0;
     border: none;
     background: transparent;
     font-size: 1rem;
@@ -222,7 +338,6 @@ body {
     transform-origin: left;
 }
 
-/* Efeito: Quando o campo está focado ou preenchido, a label sobe */
 .input-field:focus + .input-label,
 .input-field:not(:placeholder-shown) + .input-label {
     transform: translateY(-12px) scale(0.75);
@@ -230,7 +345,6 @@ body {
     font-weight: 600;
 }
 
-/* Esconde o placeholder nativo para não conflitar */
 .input-field::placeholder {
     color: transparent;
 }
@@ -238,7 +352,7 @@ body {
 /* Link Esqueceu a Senha */
 .forgot-password {
     text-align: right;
-    margin-top: -8px; /* Ajuste de espaçamento */
+    margin-top: -8px;
     margin-bottom: 8px;
 }
 
@@ -308,6 +422,10 @@ body {
     box-shadow: none;
 }
 
+[data-theme="dark"] .btn-secondary {
+    color: var(--primary-light);
+}
+
 .btn-secondary:hover {
     background-color: rgba(101, 175, 255, 0.08);
     border-color: var(--primary-base);
@@ -327,6 +445,10 @@ body {
     font-weight: 400;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     padding-top: 24px;
+}
+
+[data-theme="dark"] .login-footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ===== RESPONSIVIDADE ===== */
@@ -350,9 +472,16 @@ body {
     .btn {
         padding: 12px 16px;
     }
+    
+    .theme-toggle {
+        top: 16px;
+        right: 16px;
+        width: 46px;
+        height: 46px;
+    }
 }
 
-/* Animações para entrada do container */
+/* ===== ANIMAÇÕES ===== */
 @keyframes fadeInUp {
     from {
         opacity: 0;
