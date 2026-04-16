@@ -3,21 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lista de compras 3°SIS</title>
+    <title>Lista Compartilhada · Login</title>
+    
+    <!-- Manifest e Assets -->
     <link rel="manifest" href="manifest.json">
     <link rel="shortcut icon" href="src/img/favicon.ico" type="image/x-icon">
+    
+    <!-- CSS Principal -->
     <link rel="stylesheet" href="src/css/login.css">
+    
+    <!-- Fonte (Poppins via CSS) -->
 </head>
 <body>
+    <!-- Elementos decorativos de fundo para profundidade -->
+    <div class="bg-decoration">
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+    </div>
+
     <div class="container">
-        <img id="logo" src="src/icons/icon-512x512.png" alt="logo">
-        <h2 class="titulo">Login</h2>
-        <input type="email" id="email" placeholder="E-mail">
-        <input type="password" id="senha" placeholder="Senha">
-        <div class="botoes">
-            <button onclick="login()">Entrar</button>
-            <button onclick="cadastro()">Cadastrar</button>
+        <!-- Header com Logo e Boas-vindas -->
+        <div class="login-header">
+            <div class="logo-wrapper">
+                <img id="logo" src="src/icons/icon-512x512.png" alt="Logo Lista de Compras">
+            </div>
+            <h1 class="titulo">Bem-vindo de volta</h1>
+            <p class="subtitulo">Acesse sua lista compartilhada para continuar de onde parou.</p>
         </div>
+
+        <!-- Formulário de Login -->
+        <form id="login-form" class="login-form" onsubmit="event.preventDefault(); login();">
+            <!-- Campo Email -->
+            <div class="input-group">
+                <span class="input-icon">✉️</span>
+                <div class="input-field-wrapper">
+                    <input type="email" id="email" class="input-field" placeholder=" " required>
+                    <label for="email" class="input-label">E-mail</label>
+                </div>
+            </div>
+
+            <!-- Campo Senha -->
+            <div class="input-group">
+                <span class="input-icon">🔒</span>
+                <div class="input-field-wrapper">
+                    <input type="password" id="senha" class="input-field" placeholder=" " required>
+                    <label for="senha" class="input-label">Senha</label>
+                </div>
+            </div>
+
+            <!-- Link Esqueceu a Senha (Placeholder) -->
+            <div class="forgot-password">
+                <a href="#">Esqueceu a senha?</a>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="botoes">
+                <button type="submit" class="btn btn-primary">Entrar na conta</button>
+                <button type="button" class="btn btn-secondary" onclick="cadastro()">Criar uma conta gratuita</button>
+            </div>
+        </form>
+
+        <!-- Footer opcional (créditos ou info) -->
+        <footer class="login-footer">
+            <p>Lista de Compras 3°SIS · v1.0</p>
+        </footer>
     </div>
 
     <script type="module" src="auth.js"></script>
