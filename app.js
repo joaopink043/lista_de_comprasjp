@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
     initSoundEffects();
     setupEventListeners();
+    setupListaDelegation(); // NOVA: Configura delegação de eventos na lista
     renderCurrentList();
     updateItemCount();
     updateSyncIndicator();
@@ -129,8 +130,15 @@ function showToast(message, type = 'info') {
     toast.innerHTML = `
         <span class="toast-icon">${icons[type] || icons.info}</span>
         <span class="toast-message">${message}</span>
-        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+        <button class="toast-close">&times;</button>
     `;
+    
+    // Evento para fechar o toast
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => {
+        toast.classList.remove('toast-visible');
+        setTimeout(() => toast.remove(), 300);
+    });
     
     container.appendChild(toast);
     
@@ -139,8 +147,12 @@ function showToast(message, type = 'info') {
     });
     
     setTimeout(() => {
-        toast.classList.remove('toast-visible');
-        setTimeout(() => toast.remove(), 300);
+        if (toast.parentElement) {
+            toast.classList.remove('toast-visible');
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 300);
+        }
     }, 3000);
 }
 
@@ -151,33 +163,107 @@ function showConfirmModal(message, onConfirm) {
     const confirmBtn = document.getElementById('confirm-ok');
     const cancelBtn = document.getElementById('confirm-cancel');
     
-    if (!modal || !messageEl || !confirmBtn || !cancelBtn) return;
+    if (!modal || !messageEl || !confirmBtn || !cancelBtn) {
+        // Fallback: executar diretamente se modal não existir
+        if (confirm(message)) {
+            onConfirm();
+        }
+        return;
+    }
     
     messageEl.textContent = message;
     modal.style.display = 'flex';
     
     const closeModal = () => {
         modal.style.display = 'none';
-    };
-    
-    confirmBtn.onclick = () => {
-        onConfirm();
-        closeModal();
-    };
-    
-    cancelBtn.onclick = closeModal;
-    
-    modal.onclick = (e) => {
-        if (e.target === modal) closeModal();
+        document.removeEventListener('keydown', escHandler);
     };
     
     const escHandler = (e) => {
         if (e.key === 'Escape') {
             closeModal();
-            document.removeEventListener('keydown', escHandler);
         }
     };
+    
+    // Remove listeners antigos
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+    
+    // Pega os novos elementos
+    const newConfirmBtn = document.getElementById('confirm-ok');
+    const newCancelBtn = document.getElementById('confirm-cancel');
+    
+    newConfirmBtn.addEventListener('click', () => {
+        onConfirm();
+        closeModal();
+    });
+    
+    newCancelBtn.addEventListener('click', closeModal);
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    
     document.addEventListener('keydown', escHandler);
+}
+
+// ===== DELEGAÇÃO DE EVENTOS NA LISTA (CORRIGIDO) =====
+function setupListaDelegation() {
+    const lista = document.getElementById('lista');
+    if (!lista) return;
+    
+    // Remove listener antigo se existir
+    lista.removeEventListener('click', handleListaClick);
+    // Adiciona novo listener
+    lista.addEventListener('click', handleListaClick);
+    
+    // Também configura dblclick para edição
+    lista.addEventListener('dblclick', handleListaDblClick);
+}
+
+function handleListaClick(e) {
+    // Encontra o item-card mais próximo
+    const itemCard = e.target.closest('.item-card');
+    if (!itemCard) return;
+    
+    const itemId = parseInt(itemCard.dataset.id);
+    if (!itemId) return;
+    
+    // Verifica qual botão foi clicado
+    const deleteBtn = e.target.closest('.btn-delete');
+    const editBtn = e.target.closest('.btn-edit');
+    const checkbox = e.target.closest('.checkbox-input');
+    
+    if (deleteBtn) {
+        // Clique no botão deletar
+        e.preventDefault();
+        e.stopPropagation();
+        removerItem(itemId);
+    } else if (editBtn) {
+        // Clique no botão editar
+        e.preventDefault();
+        e.stopPropagation();
+        editarItem(itemId);
+    } else if (checkbox) {
+        // Clique no checkbox
+        toggleItem(itemId);
+    }
+}
+
+function handleListaDblClick(e) {
+    const itemCard = e.target.closest('.item-card');
+    if (!itemCard) return;
+    
+    // Só ativa edição se clicou no texto ou emoji
+    const textSpan = e.target.closest('.item-text');
+    const emojiSpan = e.target.closest('.item-category-emoji');
+    
+    if (textSpan || emojiSpan) {
+        const itemId = parseInt(itemCard.dataset.id);
+        if (itemId) {
+            editarItem(itemId);
+        }
+    }
 }
 
 // ===== GERENCIAMENTO DE LISTAS =====
@@ -220,7 +306,6 @@ function adicionarItem() {
 }
 
 function removerItem(itemId) {
-    itemToDelete = itemId;
     const item = lists[currentList]?.find(i => i.id === itemId);
     
     if (item) {
@@ -228,14 +313,13 @@ function removerItem(itemId) {
             `Tem certeza que deseja remover "${item.text}"?`,
             () => {
                 if (lists[currentList]) {
-                    lists[currentList] = lists[currentList].filter(i => i.id !== itemToDelete);
+                    lists[currentList] = lists[currentList].filter(i => i.id !== itemId);
                 }
-                itemToDelete = null;
                 saveData();
                 renderCurrentList();
                 updateItemCount();
                 SOUNDS.remove();
-                showToast('Item removido', 'info');
+                showToast('Item removido com sucesso', 'info');
             }
         );
     }
@@ -246,6 +330,7 @@ function toggleItem(itemId) {
     if (item) {
         item.checked = !item.checked;
         saveData();
+        renderCurrentList();
         updateItemCount();
         
         if (item.checked) {
@@ -281,11 +366,9 @@ function editarItem(itemId) {
             item.text = newText;
             addToHistory(newText);
             saveData();
-            renderCurrentList();
             showToast(`Item atualizado para "${newText}"`, 'success');
-        } else {
-            renderCurrentList();
         }
+        renderCurrentList();
     };
     
     input.addEventListener('blur', saveEdit);
@@ -332,17 +415,24 @@ function showSuggestions() {
     }
     
     list.innerHTML = matches.map(item => `
-        <li class="suggestion-item" data-text="${item}">
+        <li class="suggestion-item" data-text="${escapeHtml(item)}">
             <span class="suggestion-icon">🕐</span>
-            <span class="suggestion-text">${highlightMatch(item, query)}</span>
+            <span class="suggestion-text">${highlightMatch(escapeHtml(item), query)}</span>
         </li>
     `).join('');
     
     container.style.display = 'block';
 }
 
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function highlightMatch(text, query) {
-    const regex = new RegExp(`(${query})`, 'gi');
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
     return text.replace(regex, '<strong>$1</strong>');
 }
 
@@ -367,6 +457,7 @@ function renderCurrentList() {
     
     const items = lists[currentList] || [];
     
+    // Ordena: não checados primeiro, depois checados
     const sortedItems = [...items].sort((a, b) => {
         if (a.checked === b.checked) return 0;
         return a.checked ? 1 : -1;
@@ -385,20 +476,22 @@ function renderCurrentList() {
                 <label class="item-checkbox">
                     <input type="checkbox" 
                            class="checkbox-input" 
-                           ${item.checked ? 'checked' : ''} 
-                           onchange="toggleItem(${item.id})">
+                           ${item.checked ? 'checked' : ''}>
                     <span class="checkbox-custom"></span>
                     <span class="item-category-emoji">${category.emoji}</span>
-                    <span class="item-text" ondblclick="editarItem(${item.id})">${item.text}</span>
+                    <span class="item-text">${escapeHtml(item.text)}</span>
                 </label>
                 
                 <div class="item-actions">
-                    <button class="btn-edit" onclick="editarItem(${item.id})" title="Editar item">✏️</button>
-                    <button class="btn-delete" onclick="removerItem(${item.id})" title="Remover item">🗑️</button>
+                    <button class="btn-edit" title="Editar item">✏️</button>
+                    <button class="btn-delete" title="Remover item">🗑️</button>
                 </div>
             </li>
         `;
     }).join('');
+    
+    // Reconfigura delegação de eventos após renderizar
+    setupListaDelegation();
     
     updateEmptyState();
     updateItemCount();
@@ -490,16 +583,18 @@ function handleTouchEnd() {
     
     if (deltaX < -80) {
         const itemId = parseInt(swipingItem.dataset.id);
-        swipingItem.style.transition = 'all 0.3s ease';
-        swipingItem.style.transform = 'translateX(-120%)';
-        swipingItem.style.opacity = '0';
-        swipingItem.style.maxHeight = '0';
-        swipingItem.style.marginBottom = '0';
-        swipingItem.style.padding = '0';
-        
-        setTimeout(() => {
-            removerItem(itemId);
-        }, 300);
+        if (itemId) {
+            swipingItem.style.transition = 'all 0.3s ease';
+            swipingItem.style.transform = 'translateX(-120%)';
+            swipingItem.style.opacity = '0';
+            swipingItem.style.maxHeight = '0';
+            swipingItem.style.marginBottom = '0';
+            swipingItem.style.padding = '0';
+            
+            setTimeout(() => {
+                removerItem(itemId);
+            }, 300);
+        }
     } else {
         swipingItem.style.transition = 'all 0.3s ease';
         swipingItem.style.transform = 'translateX(0)';
@@ -547,7 +642,7 @@ function addNewList() {
         newTab.className = 'tab-btn';
         newTab.dataset.list = listKey;
         newTab.textContent = `${emoji} ${name}`;
-        newTab.onclick = () => switchList(listKey);
+        newTab.addEventListener('click', () => switchList(listKey));
         
         tabsContainer.insertBefore(newTab, addBtn);
     }
@@ -574,8 +669,16 @@ function setupEventListeners() {
             setTimeout(showSuggestions, 100);
         });
         
-        // Focar input ao carregar
-        itemInput.focus();
+        // Mostrar sugestões ao focar
+        itemInput.addEventListener('focus', () => {
+            setTimeout(showSuggestions, 100);
+        });
+    }
+    
+    // Botão Adicionar
+    const btnAdd = document.getElementById('btnAdd');
+    if (btnAdd) {
+        btnAdd.addEventListener('click', adicionarItem);
     }
     
     // Fechar sugestões ao clicar fora
@@ -631,7 +734,13 @@ function setupEventListeners() {
     });
 }
 
-// ===== FUNÇÕES GLOBAIS =====
+// ===== FUNÇÕES GLOBAIS (COMPATIBILIDADE) =====
+// Estas funções são expostas globalmente para compatibilidade com onclick
+window.adicionarItem = adicionarItem;
+window.removerItem = removerItem;
+window.toggleItem = toggleItem;
+window.editarItem = editarItem;
+
 window.logout = window.logout || function() {
     showConfirmModal('Tem certeza que deseja sair?', () => {
         window.location.href = 'login.html';
