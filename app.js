@@ -12,6 +12,9 @@ const CATEGORIES = {
     higiene: { emoji: '🧴', name: 'Higiene', color: '#E9D8FD' }
 };
 
+// Lista de listas protegidas (não podem ser removidas)
+const PROTECTED_LISTS = ['principal'];
+
 const SOUNDS = {
     add: null,
     remove: null,
@@ -34,10 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
     initSoundEffects();
     setupEventListeners();
-    setupListaDelegation(); // NOVA: Configura delegação de eventos na lista
+    setupListaDelegation();
+    setupTabRemoveListeners(); // NOVO: Configura listeners dos botões X
     renderCurrentList();
     updateItemCount();
     updateSyncIndicator();
+    
+    // Atualiza classes das tabs
+    updateTabsProtectedStatus();
     
     // Observa mudanças na lista para estado vazio
     const lista = document.getElementById('lista');
@@ -62,7 +69,12 @@ function loadData() {
         
         const savedCurrentList = localStorage.getItem('currentList');
         if (savedCurrentList) {
-            currentList = savedCurrentList;
+            // Verifica se a lista ainda existe
+            if (lists[savedCurrentList]) {
+                currentList = savedCurrentList;
+            } else {
+                currentList = 'principal';
+            }
         }
     } catch (e) {
         console.error('Erro ao carregar dados:', e);
@@ -133,7 +145,6 @@ function showToast(message, type = 'info') {
         <button class="toast-close">&times;</button>
     `;
     
-    // Evento para fechar o toast
     const closeBtn = toast.querySelector('.toast-close');
     closeBtn.addEventListener('click', () => {
         toast.classList.remove('toast-visible');
@@ -157,16 +168,17 @@ function showToast(message, type = 'info') {
 }
 
 // ===== MODAL DE CONFIRMAÇÃO =====
-function showConfirmModal(message, onConfirm) {
+function showConfirmModal(message, onConfirm, onCancel = null) {
     const modal = document.getElementById('confirm-modal');
     const messageEl = document.getElementById('confirm-message');
     const confirmBtn = document.getElementById('confirm-ok');
     const cancelBtn = document.getElementById('confirm-cancel');
     
     if (!modal || !messageEl || !confirmBtn || !cancelBtn) {
-        // Fallback: executar diretamente se modal não existir
         if (confirm(message)) {
             onConfirm();
+        } else if (onCancel) {
+            onCancel();
         }
         return;
     }
@@ -177,6 +189,7 @@ function showConfirmModal(message, onConfirm) {
     const closeModal = () => {
         modal.style.display = 'none';
         document.removeEventListener('keydown', escHandler);
+        if (onCancel) onCancel();
     };
     
     const escHandler = (e) => {
@@ -207,45 +220,36 @@ function showConfirmModal(message, onConfirm) {
     document.addEventListener('keydown', escHandler);
 }
 
-// ===== DELEGAÇÃO DE EVENTOS NA LISTA (CORRIGIDO) =====
+// ===== DELEGAÇÃO DE EVENTOS NA LISTA =====
 function setupListaDelegation() {
     const lista = document.getElementById('lista');
     if (!lista) return;
     
-    // Remove listener antigo se existir
     lista.removeEventListener('click', handleListaClick);
-    // Adiciona novo listener
     lista.addEventListener('click', handleListaClick);
-    
-    // Também configura dblclick para edição
     lista.addEventListener('dblclick', handleListaDblClick);
 }
 
 function handleListaClick(e) {
-    // Encontra o item-card mais próximo
     const itemCard = e.target.closest('.item-card');
     if (!itemCard) return;
     
     const itemId = parseInt(itemCard.dataset.id);
     if (!itemId) return;
     
-    // Verifica qual botão foi clicado
     const deleteBtn = e.target.closest('.btn-delete');
     const editBtn = e.target.closest('.btn-edit');
     const checkbox = e.target.closest('.checkbox-input');
     
     if (deleteBtn) {
-        // Clique no botão deletar
         e.preventDefault();
         e.stopPropagation();
         removerItem(itemId);
     } else if (editBtn) {
-        // Clique no botão editar
         e.preventDefault();
         e.stopPropagation();
         editarItem(itemId);
     } else if (checkbox) {
-        // Clique no checkbox
         toggleItem(itemId);
     }
 }
@@ -254,7 +258,6 @@ function handleListaDblClick(e) {
     const itemCard = e.target.closest('.item-card');
     if (!itemCard) return;
     
-    // Só ativa edição se clicou no texto ou emoji
     const textSpan = e.target.closest('.item-text');
     const emojiSpan = e.target.closest('.item-category-emoji');
     
@@ -266,7 +269,88 @@ function handleListaDblClick(e) {
     }
 }
 
-// ===== GERENCIAMENTO DE LISTAS =====
+// ===== NOVO: GERENCIAMENTO DE REMOÇÃO DE LISTAS =====
+function setupTabRemoveListeners() {
+    // Usa delegação de eventos no container das tabs
+    const tabsContainer = document.getElementById('listTabs');
+    if (!tabsContainer) return;
+    
+    tabsContainer.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('.tab-remove');
+        if (!removeBtn) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const listName = removeBtn.dataset.list;
+        if (listName) {
+            removerLista(listName);
+        }
+    });
+}
+
+function removerLista(listName) {
+    // Verifica se é uma lista protegida
+    if (PROTECTED_LISTS.includes(listName)) {
+        showToast('Esta lista não pode ser removida', 'warning');
+        return;
+    }
+    
+    // Verifica se a lista existe
+    if (!lists[listName]) {
+        showToast('Lista não encontrada', 'error');
+        return;
+    }
+    
+    const itemCount = lists[listName].length;
+    const message = itemCount > 0 
+        ? `Tem certeza que deseja remover a lista com ${itemCount} item(ns)? Esta ação não pode ser desfeita.`
+        : `Tem certeza que deseja remover esta lista vazia?`;
+    
+    showConfirmModal(
+        message,
+        () => {
+            // Remove a lista
+            delete lists[listName];
+            
+            // Se a lista atual foi removida, muda para principal
+            if (currentList === listName) {
+                currentList = 'principal';
+            }
+            
+            // Remove a tab visualmente
+            const tabToRemove = document.querySelector(`.tab-btn[data-list="${listName}"]`);
+            if (tabToRemove) {
+                tabToRemove.classList.add('removing');
+                setTimeout(() => {
+                    tabToRemove.remove();
+                    updateTabsProtectedStatus();
+                }, 300);
+            }
+            
+            saveData();
+            renderCurrentList();
+            updateItemCount();
+            
+            SOUNDS.remove();
+            showToast('Lista removida com sucesso', 'success');
+        }
+    );
+}
+
+function updateTabsProtectedStatus() {
+    // Adiciona classe 'protected' nas tabs que não podem ser removidas
+    document.querySelectorAll('.tab-btn[data-list]').forEach(tab => {
+        const listName = tab.dataset.list;
+        if (PROTECTED_LISTS.includes(listName)) {
+            tab.classList.add('protected');
+        } else {
+            tab.classList.remove('protected');
+        }
+    });
+}
+
+// ===== GERENCIAMENTO DE ITENS =====
 function adicionarItem() {
     const input = document.getElementById('item');
     if (!input) return;
@@ -457,7 +541,6 @@ function renderCurrentList() {
     
     const items = lists[currentList] || [];
     
-    // Ordena: não checados primeiro, depois checados
     const sortedItems = [...items].sort((a, b) => {
         if (a.checked === b.checked) return 0;
         return a.checked ? 1 : -1;
@@ -490,9 +573,7 @@ function renderCurrentList() {
         `;
     }).join('');
     
-    // Reconfigura delegação de eventos após renderizar
     setupListaDelegation();
-    
     updateEmptyState();
     updateItemCount();
 }
@@ -608,6 +689,11 @@ function handleTouchEnd() {
 
 // ===== MÚLTIPLAS LISTAS =====
 function switchList(listName) {
+    if (!lists[listName]) {
+        showToast('Lista não encontrada', 'error');
+        return;
+    }
+    
     currentList = listName;
     
     document.querySelectorAll('.tab-btn[data-list]').forEach(btn => {
@@ -621,9 +707,10 @@ function switchList(listName) {
 
 function addNewList() {
     const name = prompt('Nome da nova lista:');
-    if (!name) return;
+    if (!name || !name.trim()) return;
     
-    const listKey = name.toLowerCase().replace(/\s+/g, '-');
+    const trimmedName = name.trim();
+    const listKey = trimmedName.toLowerCase().replace(/\s+/g, '-');
     
     if (lists[listKey]) {
         showToast('Já existe uma lista com esse nome', 'warning');
@@ -641,15 +728,25 @@ function addNewList() {
         const newTab = document.createElement('button');
         newTab.className = 'tab-btn';
         newTab.dataset.list = listKey;
-        newTab.textContent = `${emoji} ${name}`;
-        newTab.addEventListener('click', () => switchList(listKey));
+        newTab.innerHTML = `
+            <span class="tab-emoji">${emoji}</span>
+            <span class="tab-name">${escapeHtml(trimmedName)}</span>
+            <span class="tab-remove" data-list="${listKey}" title="Remover lista">×</span>
+        `;
+        newTab.addEventListener('click', (e) => {
+            // Não troca de lista se clicou no X
+            if (!e.target.closest('.tab-remove')) {
+                switchList(listKey);
+            }
+        });
         
         tabsContainer.insertBefore(newTab, addBtn);
     }
     
     saveData();
     switchList(listKey);
-    showToast(`Lista "${name}" criada!`, 'success');
+    updateTabsProtectedStatus();
+    showToast(`Lista "${trimmedName}" criada!`, 'success');
 }
 
 // ===== EVENT LISTENERS =====
@@ -669,7 +766,6 @@ function setupEventListeners() {
             setTimeout(showSuggestions, 100);
         });
         
-        // Mostrar sugestões ao focar
         itemInput.addEventListener('focus', () => {
             setTimeout(showSuggestions, 100);
         });
@@ -711,9 +807,13 @@ function setupEventListeners() {
         });
     });
     
-    // Tabs de listas
+    // Tabs de listas - configurado para não trocar ao clicar no X
     document.querySelectorAll('.tab-btn[data-list]').forEach(tab => {
-        tab.addEventListener('click', () => switchList(tab.dataset.list));
+        tab.addEventListener('click', (e) => {
+            if (!e.target.closest('.tab-remove')) {
+                switchList(tab.dataset.list);
+            }
+        });
     });
     
     // Botão adicionar nova lista
@@ -734,12 +834,13 @@ function setupEventListeners() {
     });
 }
 
-// ===== FUNÇÕES GLOBAIS (COMPATIBILIDADE) =====
-// Estas funções são expostas globalmente para compatibilidade com onclick
+// ===== FUNÇÕES GLOBAIS =====
 window.adicionarItem = adicionarItem;
 window.removerItem = removerItem;
 window.toggleItem = toggleItem;
 window.editarItem = editarItem;
+window.removerLista = removerLista;
+window.switchLista = switchList;
 
 window.logout = window.logout || function() {
     showConfirmModal('Tem certeza que deseja sair?', () => {
