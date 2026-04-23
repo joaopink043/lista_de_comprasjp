@@ -7,12 +7,28 @@
     
     <!-- Manifest e Assets -->
     <link rel="manifest" href="manifest.json">
-    <link rel="shortcut icon" href="src/css/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="src/img/favicon.ico" type="image/x-icon">
     
     <!-- CSS Principal -->
     <link rel="stylesheet" href="src/css/index.css">
 </head>
 <body>
+    <!-- Container de Notificações Toast -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-icon">⚠️</div>
+            <h3 class="modal-title">Confirmar remoção</h3>
+            <p class="modal-message" id="confirm-message">Tem certeza que deseja remover este item?</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" id="confirm-cancel">Cancelar</button>
+                <button class="btn btn-danger" id="confirm-ok">Remover</button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Cabeçalho Moderno -->
         <header class="app-header">
@@ -20,9 +36,9 @@
                 <div class="header-title-section">
                     <h1 class="app-titulo">Minha Lista</h1>
                     <span class="sync-badge" title="Sincronizado">🔄 Compartilhada</span>
+                    <span class="item-count-badge" id="itemCount">0 itens</span>
                 </div>
                 <div class="header-actions">
-                    <!-- Toggle de Tema no Header -->
                     <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
                         <span class="theme-icon-light">☀️</span>
                         <span class="theme-icon-dark">🌙</span>
@@ -33,6 +49,15 @@
                     </button>
                 </div>
             </div>
+            
+            <!-- Tabs de Múltiplas Listas -->
+            <div class="list-tabs" id="listTabs">
+                <button class="tab-btn active" data-list="principal">🏠 Principal</button>
+                <button class="tab-btn" data-list="feira">🥬 Feira</button>
+                <button class="tab-btn" data-list="farmacia">💊 Farmácia</button>
+                <button class="tab-btn tab-add" id="addTabBtn" title="Nova lista">+</button>
+            </div>
+            
             <div class="header-divider"></div>
         </header>
 
@@ -45,6 +70,12 @@
                 <p>Adicione itens para começar a organizar suas compras.</p>
             </div>
 
+            <!-- Resultados do Autocomplete/Histórico -->
+            <div id="suggestions-container" class="suggestions-container" style="display: none;">
+                <div class="suggestions-header">📋 Sugestões baseadas no histórico</div>
+                <ul id="suggestions-list" class="suggestions-list"></ul>
+            </div>
+
             <!-- Lista de Compras -->
             <ul id="lista" class="lista-compras">
                 <!-- Itens serão inseridos via JS -->
@@ -53,12 +84,33 @@
 
         <!-- Rodapé com Input de Adição -->
         <footer class="app-footer">
+            <!-- Seletor de Categoria -->
+            <div class="category-selector" id="categorySelector">
+                <span class="category-label">Categoria:</span>
+                <div class="category-chips">
+                    <button class="category-chip active" data-category="geral">📦 Geral</button>
+                    <button class="category-chip" data-category="frutas">🍎 Frutas</button>
+                    <button class="category-chip" data-category="laticinios">🥛 Laticínios</button>
+                    <button class="category-chip" data-category="limpeza">🧹 Limpeza</button>
+                    <button class="category-chip" data-category="padaria">🥖 Padaria</button>
+                    <button class="category-chip" data-category="acougue">🥩 Açougue</button>
+                    <button class="category-chip" data-category="bebidas">🥤 Bebidas</button>
+                    <button class="category-chip" data-category="higiene">🧴 Higiene</button>
+                </div>
+            </div>
+
             <div class="input-wrapper">
                 <input type="text" id="item" class="input-add" placeholder="Adicionar novo item..." autocomplete="off" aria-label="Novo item">
-                <button class="btn-add" onclick="adicionarItem()" aria-label="Adicionar item">
+                <button class="btn-add" id="btnAdd" aria-label="Adicionar item">
                     <span class="btn-add-text">Adicionar</span>
                     <span class="btn-add-icon">+</span>
                 </button>
+            </div>
+
+            <!-- Indicador de Sincronização -->
+            <div class="sync-indicator" id="syncIndicator">
+                <span class="sync-dot"></span>
+                <span class="sync-text">Todas as alterações salvas</span>
             </div>
         </footer>
     </div>
@@ -109,32 +161,9 @@
             });
         }
         
-        // Sincroniza com sistema
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
             if (!localStorage.getItem('theme')) {
                 setTheme(e.matches ? 'dark' : 'light');
-            }
-        });
-
-        // Gerenciamento do Estado Vazio
-        function verificarEstadoVazio() {
-            const lista = document.getElementById('lista');
-            const emptyState = document.getElementById('empty-state');
-            if (lista && emptyState) {
-                if (lista.children.length === 0) {
-                    emptyState.style.display = 'flex';
-                } else {
-                    emptyState.style.display = 'none';
-                }
-            }
-        }
-        
-        const observer = new MutationObserver(verificarEstadoVazio);
-        window.addEventListener('DOMContentLoaded', () => {
-            const lista = document.getElementById('lista');
-            if (lista) {
-                observer.observe(lista, { childList: true, subtree: true });
-                verificarEstadoVazio();
             }
         });
     </script>
